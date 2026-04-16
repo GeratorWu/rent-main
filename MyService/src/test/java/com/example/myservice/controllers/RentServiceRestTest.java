@@ -63,4 +63,11 @@ public class RentServiceRestTest {
         mockMvc.perform(get("/cars/ABC123"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void testHelloEndpoint() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Hello"));
+    }
 }
