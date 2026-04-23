@@ -17,6 +17,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+      SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
 
     steps:
       - name: Checkout code
@@ -29,11 +33,11 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Run Tests
+      - name: Run Tests, Quality and Coverage
         run: |
           cd ./MyService
           chmod +x gradlew
-          ./gradlew test
+          ./gradlew clean check jacocoTestReport
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
@@ -41,6 +45,33 @@ jobs:
         with:
           files: |
             MyService/build/test-results/**/*.xml
+
+      - name: Upload JaCoCo Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: |
+            MyService/build/reports/jacoco/test/jacocoTestReport.xml
+            MyService/build/reports/jacoco/test/html/**
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: MyService/build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: SonarCloud Analysis
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != '' && env.SONAR_ORGANIZATION != '' }}
+        run: |
+          cd ./MyService
+          ./gradlew sonarqube
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
 
       - name: Build Docker images
         run: |
