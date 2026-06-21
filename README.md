@@ -20,9 +20,6 @@ Projet DevOps
 
 Le projet respecte les pratiques DevOps : dépôt Git, pipeline CI, architecture en couches, tests automatisés, couverture de code et analyse qualité.
 
-> Rapport complet pour la remise Moodle : voir **[RAPPORT.md](RAPPORT.md)**  
-> Guide de test détaillé : voir **[TESTING.md](TESTING.md)**
-
 ---
 
 ## Architecture
@@ -218,9 +215,3 @@ Après merge :
 git checkout main
 git pull origin main
 ```
-
----
-
-## Licence
-
-[Choix de licence — ex. Projet académique, usage pédagogique uniquement]
