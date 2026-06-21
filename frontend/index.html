@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent — Location de voitures</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">🚗</span>
+                <h1>Rent</h1>
+            </div>
+            <p class="tagline">Gestion de flotte &amp; clients</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <nav class="tabs" role="tablist">
+            <button class="tab active" data-tab="cars" role="tab" aria-selected="true">Voitures</button>
+            <button class="tab" data-tab="customers" role="tab" aria-selected="false">Clients</button>
+        </nav>
+
+        <div id="alert" class="alert hidden" role="alert"></div>
+
+        <!-- Section Voitures -->
+        <section id="panel-cars" class="panel active">
+            <div class="panel-grid">
+                <div class="card form-card">
+                    <h2>Ajouter une voiture</h2>
+                    <form id="car-form">
+                        <div class="field">
+                            <label for="car-plate">Immatriculation</label>
+                            <input id="car-plate" name="plateNumber" type="text" placeholder="ABC123" required>
+                        </div>
+                        <div class="field">
+                            <label for="car-brand">Marque</label>
+                            <input id="car-brand" name="brand" type="text" placeholder="Toyota" required>
+                        </div>
+                        <div class="field">
+                            <label for="car-price">Prix / jour (€)</label>
+                            <input id="car-price" name="price" type="number" min="0" step="0.01" placeholder="15000" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </form>
+                </div>
+
+                <div class="card list-card">
+                    <div class="card-header">
+                        <h2>Flotte disponible</h2>
+                        <button id="refresh-cars" class="btn btn-ghost" type="button">Actualiser</button>
+                    </div>
+                    <div id="cars-loading" class="loading hidden">Chargement…</div>
+                    <div id="cars-empty" class="empty hidden">Aucune voiture enregistrée.</div>
+                    <div id="cars-list" class="item-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Clients -->
+        <section id="panel-customers" class="panel">
+            <div class="panel-grid">
+                <div class="card form-card">
+                    <h2>Ajouter un client</h2>
+                    <form id="customer-form">
+                        <div class="field">
+                            <label for="customer-id">Identifiant</label>
+                            <input id="customer-id" name="id" type="text" placeholder="C001" required>
+                        </div>
+                        <div class="field">
+                            <label for="customer-name">Nom</label>
+                            <input id="customer-name" name="name" type="text" placeholder="Alice Martin" required>
+                        </div>
+                        <div class="field">
+                            <label for="customer-email">E-mail</label>
+                            <input id="customer-email" name="email" type="email" placeholder="alice@example.com" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </form>
+                </div>
+
+                <div class="card list-card">
+                    <div class="card-header">
+                        <h2>Clients inscrits</h2>
+                        <button id="refresh-customers" class="btn btn-ghost" type="button">Actualiser</button>
+                    </div>
+                    <div id="customers-loading" class="loading hidden">Chargement…</div>
+                    <div id="customers-empty" class="empty hidden">Aucun client enregistré.</div>
+                    <div id="customers-list" class="item-list"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>MyService :8080 · CustomerService :8081 · Front nginx :3000</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

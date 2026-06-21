@@ -96,6 +96,7 @@ jobs:
           sleep 20
           curl -f http://localhost:8080/
           curl -f http://localhost:8081/
+          curl -f http://localhost:3000/
           curl -f -X POST http://localhost:8080/cars \
             -H "Content-Type: application/json" \
             -d '{"plateNumber":"ABC123","brand":"Toyota","price":15000.0}'
@@ -104,4 +105,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"id":"C001","name":"Alice","email":"alice@example.com"}'
           curl -f http://localhost:8081/customers/C001
+          curl -f http://localhost:3000/api/cars
+          curl -f http://localhost:3000/api/customers
           docker compose down

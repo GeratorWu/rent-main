@@ -22,14 +22,19 @@ flowchart TB
         CC --> CS --> CD --> CE
     end
 
+    FE[Frontend nginx :3000]
+    FE -->|/api/cars| MyService
+    FE -->|/api/customers| CustomerService
     DC[docker-compose.yml] --> MyService
     DC --> CustomerService
+    DC --> FE
 ```
 
 | Service | Rôle | Port |
 |---------|------|------|
 | **MyService** | Gestion des voitures | 8080 |
 | **CustomerService** | Gestion des clients | 8081 |
+| **Frontend** | Interface web (nginx) | 3000 |
 
 ---
 
@@ -130,18 +135,48 @@ Invoke-RestMethod http://localhost:8081/customers/C001
 
 ---
 
-## 4. Tests avec Docker Compose
+## 4. Front Web
+
+Le frontend est une application HTML/CSS/JS servie par **nginx**. Il communique avec les APIs via un proxy interne (`/api/cars` → MyService, `/api/customers` → CustomerService), ce qui évite les problèmes CORS.
+
+### Lancer avec Docker (recommandé)
+
+```powershell
+docker compose up --build -d
+```
+
+Ouvrir dans le navigateur : **http://localhost:3000**
+
+Fonctionnalités :
+- Onglet **Voitures** : ajouter et lister les voitures
+- Onglet **Clients** : ajouter et lister les clients
+
+### Structure du frontend
+
+```
+frontend/
+├── index.html
+├── css/style.css
+├── js/app.js
+├── nginx.conf      # proxy vers les services back
+└── Dockerfile
+```
+
+---
+
+## 5. Tests avec Docker Compose
 
 Depuis la racine du projet :
 
 ```powershell
-# Construire et démarrer les deux services
+# Construire et démarrer les 3 services (back + front)
 docker compose up --build -d
 
 # Vérifier que les conteneurs tournent
 docker compose ps
 
-# Tester les endpoints (voir section 3)
+# Ouvrir le front : http://localhost:3000
+# Tester les endpoints API (voir section 3)
 
 # Arrêter et supprimer les conteneurs
 docker compose down
@@ -162,26 +197,27 @@ Ce script :
 
 ---
 
-## 5. Pipeline CI (GitHub Actions)
+## 6. Pipeline CI (GitHub Actions)
 
 À chaque push ou pull request sur `main` / `develop`, la CI :
 
 1. Exécute tous les tests des deux services
 2. Génère les rapports JaCoCo (artefacts téléchargeables)
 3. Lance SonarCloud (si les secrets sont configurés)
-4. Construit les deux images Docker
-5. Lance `docker compose up` et teste les APIs avec `curl`
+4. Construit les trois images Docker (2 back + front)
+5. Lance `docker compose up` et teste les APIs + le frontend avec `curl`
 
 Vérifier les résultats : onglet **Actions** du dépôt GitHub.
 
 ---
 
-## 6. Checklist avant remise Moodle
+## 7. Checklist avant remise Moodle
 
 - [ ] `./gradlew test` passe pour **MyService** et **CustomerService**
 - [ ] Rapports JaCoCo générés et captures d'écran prises
 - [ ] SonarCloud configuré et rapport exporté
-- [ ] `docker compose up --build` démarre les deux services sans erreur
+- [ ] `docker compose up --build` démarre les 3 services sans erreur
+- [ ] Front web accessible sur http://localhost:3000
 - [ ] Tests manuels API OK sur les ports 8080 et 8081
 - [ ] CI verte sur GitHub Actions
 - [ ] Rapport écrit avec schéma d'architecture et captures Google labs

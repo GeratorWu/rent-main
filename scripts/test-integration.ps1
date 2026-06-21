@@ -48,6 +48,16 @@ $tests = @(
     @{ Name = "CustomerService GET /customers/C001"; Action = {
         $customer = Invoke-RestMethod http://localhost:8081/customers/C001
         if ($customer.name -ne "Alice") { throw "Client incorrect" }
+    }},
+    @{ Name = "Frontend GET /"; Action = {
+        $response = Invoke-WebRequest http://localhost:3000/ -UseBasicParsing
+        if ($response.StatusCode -ne 200) { throw "Page inaccessible" }
+    }},
+    @{ Name = "Frontend proxy GET /api/cars"; Action = {
+        Invoke-RestMethod http://localhost:3000/api/cars | Out-Null
+    }},
+    @{ Name = "Frontend proxy GET /api/customers"; Action = {
+        Invoke-RestMethod http://localhost:3000/api/customers | Out-Null
     }}
 )
 
