@@ -1,5 +1,6 @@
 package com.example.myservice.services;
 
+import com.example.myservice.data.CarRepository;
 import com.example.myservice.entities.Car;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ public class CarServiceTest {
 
     @BeforeEach
     public void setUp() {
-        carService = new CarService();
+        carService = new CarService(new CarRepository());
     }
 
     @Test

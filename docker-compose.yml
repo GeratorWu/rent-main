@@ -1,0 +1,16 @@
+services:
+  myservice:
+    build:
+      context: ./MyService
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    container_name: myservice
+
+  customerservice:
+    build:
+      context: ./CustomerService
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    container_name: customerservice

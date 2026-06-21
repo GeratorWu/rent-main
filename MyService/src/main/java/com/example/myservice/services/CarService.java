@@ -1,26 +1,31 @@
 package com.example.myservice.services;
 
+import com.example.myservice.data.CarRepository;
 import com.example.myservice.entities.Car;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @Service
 public class CarService {
-    private List<Car> cars = new ArrayList<>();
+
+    private final CarRepository carRepository;
+
+    @Autowired
+    public CarService(CarRepository carRepository) {
+        this.carRepository = carRepository;
+    }
 
     public void addCar(Car car) {
-        cars.add(car);
+        carRepository.save(car);
     }
 
     public Car getCar(String plateNumber) {
-        return cars.stream()
-                .filter(car -> car.getPlateNumber().equals(plateNumber))
-                .findFirst()
-                .orElse(null);
+        return carRepository.findByPlateNumber(plateNumber).orElse(null);
     }
 
     public List<Car> getCars() {
-        return new ArrayList<>(cars);
+        return carRepository.findAll();
     }
 }

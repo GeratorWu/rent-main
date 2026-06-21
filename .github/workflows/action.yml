@@ -1,4 +1,4 @@
-name: CI - Kubernetes Integration Tests
+name: CI - Build, Test and Docker
 
 on:
   push:
@@ -33,29 +33,51 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Run Tests, Quality and Coverage
+      - name: Run MyService tests and coverage
         run: |
           cd ./MyService
           chmod +x gradlew
           ./gradlew clean check jacocoTestReport
 
-      - name: Publish Test Results
+      - name: Run CustomerService tests and coverage
+        run: |
+          cd ./CustomerService
+          chmod +x gradlew
+          ./gradlew clean check jacocoTestReport
+
+      - name: Publish MyService test results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          files: |
-            MyService/build/test-results/**/*.xml
+          files: MyService/build/test-results/**/*.xml
+          check_name: MyService Test Results
 
-      - name: Upload JaCoCo Report Artifact
+      - name: Publish CustomerService test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: CustomerService/build/test-results/**/*.xml
+          check_name: CustomerService Test Results
+
+      - name: Upload MyService JaCoCo report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
+          name: jacoco-report-myservice
           path: |
             MyService/build/reports/jacoco/test/jacocoTestReport.xml
             MyService/build/reports/jacoco/test/html/**
 
-      - name: SonarCloud Analysis
+      - name: Upload CustomerService JaCoCo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report-customerservice
+          path: |
+            CustomerService/build/reports/jacoco/test/jacocoTestReport.xml
+            CustomerService/build/reports/jacoco/test/html/**
+
+      - name: SonarCloud Analysis (MyService)
         if: ${{ env.SONAR_TOKEN != '' && env.SONAR_PROJECT_KEY != '' && env.SONAR_ORGANIZATION != '' }}
         run: |
           cd ./MyService
@@ -66,7 +88,20 @@ jobs:
           SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
 
       - name: Build Docker images
+        run: docker compose build
+
+      - name: Integration test with Docker Compose
         run: |
-          docker build -t myservice:latest -f MyService/Dockerfile MyService
-
-
+          docker compose up -d
+          sleep 20
+          curl -f http://localhost:8080/
+          curl -f http://localhost:8081/
+          curl -f -X POST http://localhost:8080/cars \
+            -H "Content-Type: application/json" \
+            -d '{"plateNumber":"ABC123","brand":"Toyota","price":15000.0}'
+          curl -f http://localhost:8080/cars/ABC123
+          curl -f -X POST http://localhost:8081/customers \
+            -H "Content-Type: application/json" \
+            -d '{"id":"C001","name":"Alice","email":"alice@example.com"}'
+          curl -f http://localhost:8081/customers/C001
+          docker compose down
